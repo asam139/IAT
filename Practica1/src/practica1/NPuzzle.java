@@ -1,4 +1,4 @@
-//package npuzzle;
+package practica1;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,6 +19,11 @@ public class NPuzzle {
     
     /** Tamaño del problema, el número de casillas es n+1*/
     int n; 
+    
+    /**
+     * Raiz de n. Estatico, siempre el mismo valor en un mismo juego
+     */
+    private final int raiz;
     
     /** Tablero de juego */
     ArrayList<Integer> tablero;
@@ -62,15 +67,22 @@ public class NPuzzle {
         } else
             this.n=n;
         
+        this.raiz = (int)Math.sqrt(n+1);
+        
         //Ahora obtenemos el tablero
         tablero=new ArrayList<>();
         
         //Leemos el tablero de un fichero y si no podemos lo generamos 
         //aleatoriamente
         try {  
+            Integer num, i = 0;
             Scanner scanner = new Scanner(new File(fichero));
-            while(scanner.hasNextInt())
-                tablero.add(scanner.nextInt());            
+            while(scanner.hasNextInt()){
+                num = scanner.nextInt();
+                tablero.add(num);
+                
+            }
+                            
         } catch (FileNotFoundException ex) {
             Logger.getLogger(NPuzzle.class.getName()).log(Level.SEVERE, null, ex);
             //Si ha falado la lectura del fichero,
@@ -98,6 +110,8 @@ public class NPuzzle {
             this.n=8;
         } else
             this.n=n;
+        this.raiz = (int)Math.sqrt(n+1);
+        
         //Creamos un tablero con posiciones aleatorias
         tablero=generaPermutacion(n+1);
         
@@ -115,6 +129,8 @@ public class NPuzzle {
      */
     public NPuzzle(NPuzzle puzzle) {
 	this.n=puzzle.n;
+        this.raiz = (int)Math.sqrt(n+1);
+        
 	this.tablero=new ArrayList<>(this.n+1);
 	for (int i=0;i<this.n+1;i++)
 	    this.tablero.add(puzzle.tablero.get(i));
@@ -126,6 +142,17 @@ public class NPuzzle {
         //Iniciamos la heuristica del nodo
         this.h=puzzle.h;
     }
+    
+    
+    
+    public Integer holePos(){
+        int hueco=0;
+        while (this.tablero.get(hueco) != 0) hueco++;
+        
+        return hueco;
+    }
+    
+    
     /*---------------------------------------------------------------------------*/
     /**Este procedimiento genera una permutación aleatorio de tamaño n y lo 
      * devuelve en un ArrayList.
@@ -189,7 +216,7 @@ public class NPuzzle {
         int fila_actual=1,columna_actual=1; /*Posición de la casilla que estamos viendo*/
         int fila=1,columna=1; /*Posición donde debería estar la casilla*/
         int c; /*Casilla actual*/
-        int ancho=(int)Math.sqrt(this.n+1);/*Ancho del tablero*/
+        int ancho = raiz;/*Ancho del tablero*/
   
         for (i=0,distancia=0;i<this.n+1;i++) {
             c=this.tablero.get(i);
@@ -219,7 +246,7 @@ public class NPuzzle {
     /** Convierte el objeto NPuzzle a cadena para porder imprimirlo*/
     @Override
     public String toString() {
-        int filas=(int)Math.sqrt(n+1);
+        int filas= raiz;
         String out= n+"-Puzzle g="+this.g+" h="+this.h+"{\n" ; //Mostramos el n
         //Mostramos el tablero
         for (int i=0;i<=n;i++) {
@@ -261,7 +288,7 @@ public class NPuzzle {
         int i,j;
         int inversiones=0;
         int pos0=0,fila=1;
-        int ancho=(int)Math.sqrt(this.n+1);/*Ancho del tablero*/
+        int ancho = raiz;/*Ancho del tablero*/
 
  
 	/*Calculamos el número de inversiones del puzzle, una inversión es
@@ -338,6 +365,19 @@ public class NPuzzle {
         if (movimiento==ABAJO) return ARRIBA;
         return -1;
     }
+    
+    public ArrayList<Integer> allowedMovements(){
+        ArrayList<Integer> aMov = new ArrayList<Integer>();
+        Integer holePos = this.holePos();
+        
+        if (!(holePos == 0 || holePos % raiz == 0)) aMov.add(IZQUIERDA);
+        if (!(holePos==n || (holePos+1) % raiz == 0)) aMov.add(DERECHA);
+        if (!(holePos >= 0 && holePos < raiz)) aMov.add(ARRIBA);
+        if (!(holePos <= n && holePos >= raiz * (raiz-1) )) aMov.add(ABAJO);
+
+        return aMov;
+    }
+    
     /*---------------------------------------------------------------------------*/
     /**Movemos el espacio en blanco, si podemos.
      * @param movimiento dirección del movimiento del hueco
@@ -345,11 +385,9 @@ public class NPuzzle {
     public boolean mueve(int movimiento) {
        
         //coger pos hueco
-        int hueco=0;
-        while (this.tablero.get(hueco)!=0) hueco++;
+        int hueco= this.holePos();
         
         //Cogemos la raiz de n+1 pues nos hará falta para mirar movimientos válidos.
-        int raiz=(int)Math.sqrt(n+1);
         if (movimiento==IZQUIERDA) {
             if (hueco==0 || hueco%raiz==0)
               return false;
@@ -407,26 +445,55 @@ public class NPuzzle {
        está vacía es que no se ha encontrado ninguna solución o el tablero pasado era 
        el objetivo.
     */
-    public ArrayList<NPuzzle> busquedaAleatoria() {
-        
+    public ArrayList<Integer> busquedaAleatoria(Integer tMax) {
+
         int movimiento;
-        int movPadre=-1;/*Movimiento para llegar al padre*/
-        ArrayList<NPuzzle> vistos=new ArrayList<>(); /*Lista de nodos vistos*/
-        
-        long tiempo_inicial=System.currentTimeMillis();
+        int movPadre = -1;/*Movimiento para llegar al padre*/
+        ArrayList<Integer> vistos = new ArrayList<>(); /*Lista de nodos vistos*/
+
+        long tiempo_inicial = System.currentTimeMillis();
         while (!this.objetivo()) {
-            movimiento = (int)(Math.random()*5); 
-            if (movimiento!=movPadre && this.mueve(movimiento)) {
-		    vistos.add(0,new NPuzzle(this));
-                    movPadre=inverso(movimiento);
+            movimiento = (int) (Math.random() * 5);
+            if (movimiento != movPadre && this.mueve(movimiento)) {
+                vistos.add(0, movimiento);
+                movPadre = inverso(movimiento);
             }
 
             /*Si llevamos más de TMAX segundos, no hemos encontrado solución*/
-            double tiempo_total=(System.currentTimeMillis()-tiempo_inicial)/1000.;
-            if (tiempo_total>60/*TMAX*/){System.out.println("Vistos="+vistos.size());return new ArrayList<>();}
+            double tiempo_total = (System.currentTimeMillis() - tiempo_inicial) / 1000.;
+            if (tiempo_total > tMax) {
+                System.out.println("Vistos=" + vistos.size());
+                return new ArrayList<>();
+            }
         }
         return vistos;
     }
+    
+    public ArrayList<Integer> improvedRandomSearch(Integer tMax) {
+
+        int movimiento;
+        int movPadre = -1;/*Movimiento para llegar al padre*/
+        ArrayList<Integer> vistos = new ArrayList<>(); /*Lista de nodos vistos*/
+
+        long tiempo_inicial = System.currentTimeMillis();
+        while (!this.objetivo()) {
+            //ArrayList<Integer> allowedMovements = this.posibles
+            movimiento = (int) (Math.random() * 5);
+            if (movimiento != movPadre && this.mueve(movimiento)) {
+                vistos.add(0, movimiento);
+                movPadre = inverso(movimiento);
+            }
+
+            /*Si llevamos más de TMAX segundos, no hemos encontrado solución*/
+            double tiempo_total = (System.currentTimeMillis() - tiempo_inicial) / 1000.;
+            if (tiempo_total > tMax) {
+                System.out.println("Vistos=" + vistos.size());
+                return new ArrayList<>();
+            }
+        }
+        return vistos;
+    }
+    
     /*---------------------------------------------------------------------------*/
     /**
      * Este método devuelve el plan de movimientos seguidos desde el origen hasta el
@@ -491,7 +558,7 @@ public class NPuzzle {
         long tiempo_inicial=System.currentTimeMillis();
 	NPuzzle copia=new NPuzzle(puzzle);
         ArrayList<Integer> movs=null;
-        ArrayList<NPuzzle> nodos=copia.busquedaAleatoria();
+        ArrayList<Integer> nodos=copia.busquedaAleatoria(TMAX);
         if (nodos.size()<=0) 
             System.out.println("Solución NO encontrada.");
         else {
