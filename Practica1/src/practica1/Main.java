@@ -84,7 +84,9 @@ public class Main {
         NPuzzle puzzleCopy = new NPuzzle(puzzle);
         
         long start = System.currentTimeMillis();
-        ArrayList<Integer> nodes = puzzleCopy.busquedaAleatoria(tMax);
+        //ArrayList<Integer> nodes = puzzleCopy.busquedaAleatoria(tMax);
+        ArrayList<Integer> nodes = puzzleCopy.improvedRandomSearch(tMax);
+       
         long end = System.currentTimeMillis();
         
         

@@ -477,8 +477,9 @@ public class NPuzzle {
 
         long tiempo_inicial = System.currentTimeMillis();
         while (!this.objetivo()) {
-            //ArrayList<Integer> allowedMovements = this.posibles
-            movimiento = (int) (Math.random() * 5);
+            ArrayList<Integer> allowedMovements = this.allowedMovements();
+            int index = (int)(Math.random() * allowedMovements.size());
+            movimiento = allowedMovements.get(index);
             if (movimiento != movPadre && this.mueve(movimiento)) {
                 vistos.add(0, movimiento);
                 movPadre = inverso(movimiento);
