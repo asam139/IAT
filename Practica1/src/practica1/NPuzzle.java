@@ -469,7 +469,7 @@ public class NPuzzle {
         return vistos;
     }
     
-    public ArrayList<Integer> improvedRandomSearch(Integer tMax) {
+    public ArrayList<Integer>improvedRandomSearch(Integer tMax) {
 
         int movimiento;
         int movPadre = -1;/*Movimiento para llegar al padre*/
@@ -495,7 +495,63 @@ public class NPuzzle {
         return vistos;
     }
     
-    public ArrayList<Integer>iterativeDeepeningSearch(Integer tMax) {
+    public ArrayList<Integer>depthFirstSearch(Integer tMax) {
+        ArrayList<NPuzzle> opened = new ArrayList<NPuzzle>();
+        ArrayList<NPuzzle> closed = new ArrayList<NPuzzle>();
+        ArrayList<Integer> allowedMovements = null;
+        
+        HashMap <Integer, Boolean> hashMap = new HashMap <Integer,Boolean>();
+        //hashMap.getOrDefault(this.tablero.hashCode(), false);
+        hashMap.put(this.tablero.hashCode(), true);
+        opened.add(this);
+        
+        NPuzzle current = opened.get(0);
+       
+        boolean found = current.objetivo();
+        
+        long tiempo_inicial = System.currentTimeMillis();
+        while (!found){
+            
+            allowedMovements = current.allowedMovements();
+            for (Integer i : allowedMovements){
+                NPuzzle copy = new NPuzzle(current);
+                copy.mueve(i);
+                
+                boolean viewed = hashMap.getOrDefault(copy.tablero.hashCode(), false);
+                if (!viewed) {
+                    hashMap.put(copy.tablero.hashCode(), true);
+                    opened.add(copy);
+                }
+            }
+            
+            opened.remove(current);
+            closed.add(0, current);
+            
+            if (opened.size() > 0) {
+                current = opened.get(0);
+                found = current.objetivo();
+                //System.out.println("Current Puzzle:\n\n" + current);
+            }else{
+                break;
+            }
+            
+            
+            double tiempo_total = (System.currentTimeMillis() - tiempo_inicial) / 1000.;
+            if (tiempo_total > tMax) {
+                break;
+            }
+            
+        }
+        
+        if(found){
+            return plan(closed, this);
+        }else{
+            return new ArrayList<Integer>();
+        }
+       
+    }
+    
+     public ArrayList<Integer>breadthFirstSearch(Integer tMax) {
         ArrayList<NPuzzle> opened = new ArrayList<NPuzzle>();
         ArrayList<NPuzzle> closed = new ArrayList<NPuzzle>();
         ArrayList<Integer> allowedMovements = null;
@@ -550,6 +606,9 @@ public class NPuzzle {
         }
        
     }
+    
+    
+    
     
     /*---------------------------------------------------------------------------*/
     /**
