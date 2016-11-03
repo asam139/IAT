@@ -520,7 +520,7 @@ public class NPuzzle {
                 boolean viewed = hashMap.getOrDefault(copy.tablero.hashCode(), false);
                 if (!viewed) {
                     hashMap.put(copy.tablero.hashCode(), true);
-                    opened.add(0, copy);
+                    opened.add(1, copy);
                 }
             }
             
