@@ -686,13 +686,13 @@ public class NPuzzle {
             try {
                 current = opened.get(0);
             }catch (Exception e){
-                //Opened is empty, there is not solution
+   
                 return steps;
             }
             //comprobar si objetivo
             found = current.objetivo();
 
-            //expandir
+   
             possibles = current.allowedMovements();
             for (int i : possibles){
                 newPuzzle = new NPuzzle(current);
@@ -700,7 +700,8 @@ public class NPuzzle {
                 
                 boolean viewed = hashMap.getOrDefault(newPuzzle.tablero.hashCode(), false);
                 if (!viewed) {
-                    // se añade el nuevo puzzle, teniendo en cuenta que el vector ABIERTOS esta ordenado
+                    hashMap.put(newPuzzle.tablero.hashCode(), true);
+                    
                     ListIterator<NPuzzle> iterator = opened.listIterator();
                     NPuzzle pointer;
                     try {
