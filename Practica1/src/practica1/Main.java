@@ -88,8 +88,9 @@ public class Main {
         //ArrayList<Integer> nodes = puzzleCopy.improvedRandomSearch(tMax);
         //ArrayList<Integer> nodes = puzzleCopy.depthFirstSearch(tMax);
         //ArrayList<Integer> nodes = puzzleCopy.breadthFirstSearch(tMax);
-        ArrayList<Integer> nodes = puzzleCopy.depthFirstSearchWithHillClimbing(tMax);
-        
+        //ArrayList<Integer> nodes = puzzleCopy.depthFirstSearchWithHillClimbing(tMax);
+        ArrayList<Integer> nodes = puzzleCopy.aBestFirstSearch(tMax);
+     
         long end = System.currentTimeMillis();
         
         

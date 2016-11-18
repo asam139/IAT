@@ -663,6 +663,77 @@ public class NPuzzle {
         }
        
     }
+     
+    public ArrayList<Integer> aBestFirstSearch(Integer tMax){
+
+        ArrayList<NPuzzle> opened = new ArrayList<>();
+        ArrayList<NPuzzle> closed = new ArrayList<>();
+        HashMap <Integer, Boolean> hashMap = new HashMap <Integer,Boolean>();
+        ArrayList<Integer> steps = new ArrayList<>();
+        ArrayList<Integer> possibles = new ArrayList<>();
+         
+        NPuzzle current, newPuzzle;
+        boolean found = false;
+
+        hashMap.put(this.tablero.hashCode(), true);
+        opened.add(this);
+
+      
+        long tiempo_inicial = System.currentTimeMillis();
+        while (!found){
+
+            //seleccionar
+            try {
+                current = opened.get(0);
+            }catch (Exception e){
+                //Opened is empty, there is not solution
+                return steps;
+            }
+            //comprobar si objetivo
+            found = current.objetivo();
+
+            //expandir
+            possibles = current.allowedMovements();
+            for (int i : possibles){
+                newPuzzle = new NPuzzle(current);
+                newPuzzle.mueve(i);
+                
+                boolean viewed = hashMap.getOrDefault(newPuzzle.tablero.hashCode(), false);
+                if (!viewed) {
+                    // se añade el nuevo puzzle, teniendo en cuenta que el vector ABIERTOS esta ordenado
+                    ListIterator<NPuzzle> iterator = opened.listIterator();
+                    NPuzzle pointer;
+                    try {
+                        int f = newPuzzle.f();
+                        while (true){
+                            pointer = iterator.next();
+                            if (f < pointer.f()) {
+                                iterator.add(newPuzzle);
+                                break;
+                            }
+                        }
+                    } catch (NoSuchElementException e) {
+                        iterator.add(newPuzzle);
+                    }
+                }
+            }
+            
+            opened.remove(current);
+            closed.add(0,current);
+            
+            
+            double tiempo_total = (System.currentTimeMillis() - tiempo_inicial) / 1000.;
+            if (tiempo_total > tMax) {
+                break;
+            }
+            
+        }
+        steps = plan(closed, this);
+      
+        return steps;
+    }
+
+
     
     
     /*---------------------------------------------------------------------------*/
