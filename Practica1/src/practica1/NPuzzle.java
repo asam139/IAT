@@ -17,13 +17,8 @@ import java.util.logging.Logger;
 
 public class NPuzzle {
     
-    /** Tamaño del problema, el número de casillas es n+1*/
+    /** TamaÃ±o del problema, el nÃºmero de casillas es n+1*/
     int n; 
-    
-    /**
-     * Raiz de n. Estatico, siempre el mismo valor en un mismo juego
-     */
-    private final int raiz;
     
     /** Tablero de juego */
     ArrayList<Integer> tablero;
@@ -31,16 +26,16 @@ public class NPuzzle {
     /** Movimiento para llegar al nodo padre, si es ! de 1,2,3,4 no lo sabemos*/
     int padre;
     
-    /** Valor de la función costo para el nodo (profundidad)*/
+    /** Valor de la funciÃ³n costo para el nodo (profundidad)*/
     int g;
     
-    /** Valor de la función heurística para el nodo*/
+    /** Valor de la funciÃ³n heurÃ­stica para el nodo*/
     int h;
 
     /**
-     * CTes. para indicar los segundos máximos de espera
+     * CTes. para indicar los segundos mÃ¡ximos de espera
      */
-    public static final int TMAX = 180;
+    public static final int TMAX = 300;
     
      /**
      * CTes. para las direcciones del hueco
@@ -56,7 +51,7 @@ public class NPuzzle {
     /**
      * Constructor para crear un n-puzzle a partir de un fichero.
      * @param fichero nombre del fichero con el n-puzzle
-     * @param n indica el tamaño del tablero. Lo rormal 8 ó 15 (8-puzzle/15puzzle)
+     * @param n indica el tamaÃ±o del tablero. Lo rormal 8 Ã³ 15 (8-puzzle/15puzzle)
      */
     public NPuzzle(String fichero, int n) {
         
@@ -67,27 +62,20 @@ public class NPuzzle {
         } else
             this.n=n;
         
-        this.raiz = (int)Math.sqrt(n+1);
-        
         //Ahora obtenemos el tablero
         tablero=new ArrayList<>();
         
         //Leemos el tablero de un fichero y si no podemos lo generamos 
         //aleatoriamente
         try {  
-            Integer num, i = 0;
             Scanner scanner = new Scanner(new File(fichero));
-            while(scanner.hasNextInt()){
-                num = scanner.nextInt();
-                tablero.add(num);
-                
-            }
-                            
+            while(scanner.hasNextInt())
+                tablero.add(scanner.nextInt());            
         } catch (FileNotFoundException ex) {
             Logger.getLogger(NPuzzle.class.getName()).log(Level.SEVERE, null, ex);
             //Si ha falado la lectura del fichero,
             //creamos un tablero con posiciones aleatorias
-            tablero=generaPermutacion(n+1);
+            tablero=generaPermutacion(n+1);                    
         }
         
         //Iniciamos el padre del nodo a 0
@@ -96,12 +84,13 @@ public class NPuzzle {
         this.g=0;
         //Iniciamos la heuristica del nodo
         this.h=heuristica();
+        //this.h=heuristica2();
         
     }
     /*---------------------------------------------------------------------------*/
     /**
      * Constructor para un tablero aleatorio de un n-puzzle.
-     * @param n indica el tamaño del tablero. Lo rormal 8 ó 15 (8-puzzle/15puzzle)
+     * @param n indica el tamaÃ±o del tablero. Lo rormal 8 Ã³ 15 (8-puzzle/15puzzle)
      */
     public NPuzzle(int n) {
         //Guardamos el n si es correcto
@@ -110,17 +99,16 @@ public class NPuzzle {
             this.n=8;
         } else
             this.n=n;
-        this.raiz = (int)Math.sqrt(n+1);
-        
         //Creamos un tablero con posiciones aleatorias
-        tablero=generaPermutacion(n+1);
-        
+        tablero = generaPermutacion(n+1);
+        //tablero = new ArrayList<>(Arrays.asList(9, 10, 15, 14, 2, 4, 6, 0, 11, 5, 7, 3, 12, 13, 1, 8));
         //Iniciamos el padre del nodo a 0
         this.padre=0;
         //Iniciamos el costo del nodo a 0
         this.g=0;
         //Iniciamos la heuristica del nodo
         this.h=heuristica();
+        //this.h=heuristica2();
     }
  /*---------------------------------------------------------------------------*/
     /**
@@ -129,8 +117,6 @@ public class NPuzzle {
      */
     public NPuzzle(NPuzzle puzzle) {
 	this.n=puzzle.n;
-        this.raiz = (int)Math.sqrt(n+1);
-        
 	this.tablero=new ArrayList<>(this.n+1);
 	for (int i=0;i<this.n+1;i++)
 	    this.tablero.add(puzzle.tablero.get(i));
@@ -142,26 +128,15 @@ public class NPuzzle {
         //Iniciamos la heuristica del nodo
         this.h=puzzle.h;
     }
-    
-    
-    
-    public Integer holePos(){
-        int hueco=0;
-        while (this.tablero.get(hueco) != 0) hueco++;
-        
-        return hueco;
-    }
-    
-    
     /*---------------------------------------------------------------------------*/
-    /**Este procedimiento genera una permutación aleatorio de tamaño n y lo 
+    /**Este procedimiento genera una permutaciÃ³n aleatorio de tamaÃ±o n y lo 
      * devuelve en un ArrayList.
-     * @param n tamaño de la permutación
-     * @return ArrayList donde se alamacena la permutación
+     * @param n tamaÃ±o de la permutaciÃ³n
+     * @return ArrayList donde se alamacena la permutaciÃ³n
     */
     final ArrayList<Integer> generaPermutacion(int n){
         ArrayList<Integer> permutacion=new ArrayList<>(n);
-        //Generamos los números de la permutación
+        //Generamos los nÃºmeros de la permutaciÃ³n
         for (int i=0;i<n;i++)
             permutacion.add(i);
         //Los mezclamos y los devolvemos
@@ -170,7 +145,7 @@ public class NPuzzle {
     }
     /*---------------------------------------------------------------------------*/
     /**
-     * Esta función calcula el valor f del nodo como la suma del coste (g) y la
+     * Esta funciÃ³n calcula el valor f del nodo como la suma del coste (g) y la
      * herutistica (h)
      * @return f(node)=g(node)+h(node)
      */
@@ -179,8 +154,8 @@ public class NPuzzle {
     }
     /*---------------------------------------------------------------------------*/
     /**
-     * Esta función devuelve la profundida nodo 
-     * @return la profundidad enla qeu está el nodo en el árbol de búsqueda
+     * Esta funciÃ³n devuelve la profundida nodo 
+     * @return la profundidad enla qeu estÃ¡ el nodo en el Ã¡rbol de bÃºsqueda
      */
     public int profundidad() {
         return this.g;
@@ -188,10 +163,10 @@ public class NPuzzle {
    
     /*---------------------------------------------------------------------------*/
     /**
-       Esta función devuelve un valor heurítico para el tablero dado basado en la 
-       distancia de Hamming, que nos da el número de casillas mal colocadas. Si todas
-       están mal colocadas devolverá n y si están todas bien colocadas devolverá 0.
-       @param puzzle del cual queremos calcular la heurística.
+       Esta funciÃ³n devuelve un valor heurÃ­tico para el tablero dado basado en la 
+       distancia de Hamming, que nos da el nÃºmero de casillas mal colocadas. Si todas
+       estÃ¡n mal colocadas devolverÃ¡ n y si estÃ¡n todas bien colocadas devolverÃ¡ 0.
+       @param puzzle del cual queremos calcular la heurÃ­stica.
        @return distancia de Hamming del puzzle
      */
     public int heuristica2() {
@@ -205,29 +180,29 @@ public class NPuzzle {
     }
     /*---------------------------------------------------------------------------*/
     /**
-       Esta función devuelve un valor heurístico para el tablero dado basado en la 
-       distancia Manhattan, que nos da la suma de las distancias desde la posición
-       actual de cada ficha hasta su posición original. 
-       @param puzzle del cual queremos calcular la heurística.
+       Esta funciÃ³n devuelve un valor heurÃ­stico para el tablero dado basado en la 
+       distancia Manhattan, que nos da la suma de las distancias desde la posiciÃ³n
+       actual de cada ficha hasta su posiciÃ³n original. 
+       @param puzzle del cual queremos calcular la heurÃ­stica.
        @return distancia de Hamming del puzzle
      */
     public int heuristica() {
         int i,distancia;
-        int fila_actual=1,columna_actual=1; /*Posición de la casilla que estamos viendo*/
-        int fila=1,columna=1; /*Posición donde debería estar la casilla*/
+        int fila_actual=1,columna_actual=1; /*PosiciÃ³n de la casilla que estamos viendo*/
+        int fila=1,columna=1; /*PosiciÃ³n donde deberÃ­a estar la casilla*/
         int c; /*Casilla actual*/
-        int ancho = raiz;/*Ancho del tablero*/
+        int ancho=(int)Math.sqrt(this.n+1);/*Ancho del tablero*/
   
         for (i=0,distancia=0;i<this.n+1;i++) {
             c=this.tablero.get(i);
 
             if (c!=0) {
-                /*Buscamos cual es la casilla que debería ocupar*/
+                /*Buscamos cual es la casilla que deberÃ­a ocupar*/
                 fila=1;
                 while (!( c>=ancho*(fila-1) && c<ancho*fila )) fila++;
                 columna=(c%ancho)+1;
 
-                /*Añadimos la distancia*/
+                /*AÃ±adimos la distancia*/
                 distancia+=Math.abs(fila-fila_actual)+Math.abs(columna-columna_actual);
             }
 
@@ -246,7 +221,7 @@ public class NPuzzle {
     /** Convierte el objeto NPuzzle a cadena para porder imprimirlo*/
     @Override
     public String toString() {
-        int filas= raiz;
+        int filas=(int)Math.sqrt(n+1);
         String out= n+"-Puzzle g="+this.g+" h="+this.h+"{\n" ; //Mostramos el n
         //Mostramos el tablero
         for (int i=0;i<=n;i++) {
@@ -259,40 +234,40 @@ public class NPuzzle {
         return out;
     }
     /*---------------------------------------------------------------------------*/
-    /**Miramos si este n-puzzle está en su estado objetivo
-     @return si está o no en su estado objetivo*/
+    /**Miramos si este n-puzzle estÃ¡ en su estado objetivo
+     @return si estÃ¡ o no en su estado objetivo*/
     public boolean objetivo() {
         for (int i=0;i<n;i++)
-            //si encontramos una ficha mal colocada no está terminado
+            //si encontramos una ficha mal colocada no estÃ¡ terminado
 	    if (this.tablero.get(i)!=i) {
                 return false;
             }
         return true;
     }
     /*---------------------------------------------------------------------------*/
-    /**Esta función nos dice si el n-puzzle tiene solución o no. Un tablero será 
+    /**Esta funciÃ³n nos dice si el n-puzzle tiene soluciÃ³n o no. Un tablero serÃ¡ 
      * resoluble si :
-     *     -Si el ancho del tablero es impar (p.e. 8-puzzle) si el número de 
+     *     -Si el ancho del tablero es impar (p.e. 8-puzzle) si el nÃºmero de 
      *      inversiones es par el tablero es resoluble.
-     *     -Si el ancho del tablero es par (p.e. 15-puzzle) si el número de 
-     *      inversiones + la fila donde está el hueco tiene la misma paridad 
-     *      que el tablero solución (que tiene 0 inversiones + fila donde está 
+     *     -Si el ancho del tablero es par (p.e. 15-puzzle) si el nÃºmero de 
+     *      inversiones + la fila donde estÃ¡ el hueco tiene la misma paridad 
+     *      que el tablero soluciÃ³n (que tiene 0 inversiones + fila donde estÃ¡ 
      *      el hueco), entonces el tablero es resoluble.
-     * Nota: Se cuenta el número de fila desde arriba. Una inversión es cuando 
-     * a está antes que b y a>b. Para calcular las inversiones se descargta el 
+     * Nota: Se cuenta el nÃºmero de fila desde arriba. Una inversiÃ³n es cuando 
+     * a estÃ¡ antes que b y a>b. Para calcular las inversiones se descargta el 
      * hueco y se disponen todas las piezas consecutivamente (como en un vector).
      * @param puzzle a comprobar
-     * @return si tiene solución o no.
+     * @return si tiene soluciÃ³n o no.
      */
     boolean resoluble(){
         int i,j;
         int inversiones=0;
         int pos0=0,fila=1;
-        int ancho = raiz;/*Ancho del tablero*/
+        int ancho=(int)Math.sqrt(this.n+1);/*Ancho del tablero*/
 
  
-	/*Calculamos el número de inversiones del puzzle, una inversión es
-	  cuando a está antes que b y a>b (descartamos el hueco)*/
+	/*Calculamos el nÃºmero de inversiones del puzzle, una inversiÃ³n es
+	  cuando a estÃ¡ antes que b y a>b (descartamos el hueco)*/
 	for(i=0;i<this.n;i++)
 	    if (tablero.get(i)!=0 )
 		for(j=i+1;j<this.n+1;j++) {
@@ -300,26 +275,26 @@ public class NPuzzle {
 			inversiones++;
 		}
 
-        /*Si el ancho es impar, entonces el número de inversiones en un tablero
+        /*Si el ancho es impar, entonces el nÃºmero de inversiones en un tablero
 	  resoluble es par*/
         if (ancho%2!=0) {
             return inversiones%2==0;
         } else {
             /*Caso de tablero impar*/
 
-            /*Buscamos la posición del hueco*/
+            /*Buscamos la posiciÃ³n del hueco*/
             for (pos0=0; tablero.get(pos0)!=0 && pos0<n+1; pos0++);
-	    /*Buscamos la fila en la que está el hueco*/
+	    /*Buscamos la fila en la que estÃ¡ el hueco*/
 	    fila=1;
 	    while (!( pos0>=ancho*(fila-1) && pos0<ancho*fila )) fila++;
-            /*Nuestro tablero solución tiene paridad impar, pues el 0 lo tiene
+            /*Nuestro tablero soluciÃ³n tiene paridad impar, pues el 0 lo tiene
             en la primera fila, por tanto si las inversiones+ la fila del hueco es
-            impar tiene solución*/
+            impar tiene soluciÃ³n*/
 	    return (inversiones+fila)%2 != 0;
         }
     }
     /*---------------------------------------------------------------------------*/
-    /*Método para comparar dos tableros del n-Puzzle*/
+    /*MÃ©todo para comparar dos tableros del n-Puzzle*/
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -335,7 +310,7 @@ public class NPuzzle {
             return false;
         }
         
-        //Distinta heurística, distintos seguro
+        //Distinta heurÃ­stica, distintos seguro
         if (this.h != other.h) {
             return false;
         }
@@ -355,8 +330,8 @@ public class NPuzzle {
         tablero.set(j, aux);
     }
     /*---------------------------------------------------------------------------*/
-    /**Obtenemos el movimiento inversodel que le pasamos como parámetro
-    * @param movimiento dirección del movimiento del hueco
+    /**Obtenemos el movimiento inversodel que le pasamos como parÃ¡metro
+    * @param movimiento direcciÃ³n del movimiento del hueco
     * @return movimiento inverso*/
     public int inverso(int movimiento) {
         if (movimiento==IZQUIERDA) return DERECHA;
@@ -365,36 +340,25 @@ public class NPuzzle {
         if (movimiento==ABAJO) return ARRIBA;
         return -1;
     }
-    
-    public ArrayList<Integer> allowedMovements(){
-        ArrayList<Integer> aMov = new ArrayList<Integer>();
-        Integer holePos = this.holePos();
-        
-        if (!(holePos == 0 || holePos % raiz == 0)) aMov.add(IZQUIERDA);
-        if (!(holePos==n || (holePos+1) % raiz == 0)) aMov.add(DERECHA);
-        if (!(holePos >= 0 && holePos < raiz)) aMov.add(ARRIBA);
-        if (!(holePos <= n && holePos >= raiz * (raiz-1) )) aMov.add(ABAJO);
-
-        return aMov;
-    }
-    
     /*---------------------------------------------------------------------------*/
     /**Movemos el espacio en blanco, si podemos.
-     * @param movimiento dirección del movimiento del hueco
-     @return si está o no en su estado objetivo*/
+     * @param movimiento direcciÃ³n del movimiento del hueco
+     @return si estÃ¡ o no en su estado objetivo*/
     public boolean mueve(int movimiento) {
        
         //coger pos hueco
-        int hueco= this.holePos();
+        int hueco=0;
+        while (this.tablero.get(hueco)!=0) hueco++;
         
-        //Cogemos la raiz de n+1 pues nos hará falta para mirar movimientos válidos.
+        //Cogemos la raiz de n+1 pues nos harÃ¡ falta para mirar movimientos vÃ¡lidos.
+        int raiz=(int)Math.sqrt(n+1);
         if (movimiento==IZQUIERDA) {
             if (hueco==0 || hueco%raiz==0)
               return false;
             else {
                 this.swap(hueco-1,hueco);  
-                this.g++; //actualizamos función costo
-                this.h=heuristica(); //actualizamos función heurística   
+                this.g++; //actualizamos funciÃ³n costo
+                this.h=heuristica(); //actualizamos funciÃ³n heurÃ­stica   
                 this.padre=inverso(movimiento);
                 return true;
             }
@@ -403,8 +367,8 @@ public class NPuzzle {
               return false;
             else {
                 this.swap(hueco+1,hueco);
-                this.g++; //actualizamos función costo
-                this.h=heuristica(); //actualizamos función heurística 
+                this.g++; //actualizamos funciÃ³n costo
+                this.h=heuristica(); //actualizamos funciÃ³n heurÃ­stica 
                 this.padre=inverso(movimiento);
                 return true;
             }
@@ -414,8 +378,8 @@ public class NPuzzle {
               return false;
             else {
                 this.swap(hueco-raiz,hueco);
-                this.g++; //actualizamos función costo
-                this.h=heuristica(); //actualizamos función heurística 
+                this.g++; //actualizamos funciÃ³n costo
+                this.h=heuristica(); //actualizamos funciÃ³n heurÃ­stica 
                 this.padre=inverso(movimiento);
                 return true;
             }
@@ -425,322 +389,50 @@ public class NPuzzle {
               return false;
             else {
                 this.swap(hueco+raiz,hueco);
-                this.g++; //actualizamos función costo
-                this.h=heuristica(); //actualizamos función heurística 
+                this.g++; //actualizamos funciÃ³n costo
+                this.h=heuristica(); //actualizamos funciÃ³n heurÃ­stica 
                 this.padre=inverso(movimiento);
                 return true;
             }
             
         }
         
-        //Movimiento erróneo
+        //Movimiento errÃ³neo
         return false;
                 
     }
     /*---------------------------------------------------------------------------*/
     /**
-       Este método realiza una búsqueda aleatoria de la solución de un 
+       Este mÃ©todo realiza una bÃºsqueda aleatoria de la soluciÃ³n de un 
        n-puzzle, durante TMAX segundos.
        @return la lista de movimiento realizados para llegar al estado objetivo, si 
-       está vacía es que no se ha encontrado ninguna solución o el tablero pasado era 
+       estÃ¡ vacÃ­a es que no se ha encontrado ninguna soluciÃ³n o el tablero pasado era 
        el objetivo.
     */
-    public ArrayList<Integer> busquedaAleatoria(Integer tMax) {
-
+    public ArrayList<NPuzzle> busquedaAleatoria() {
+        
         int movimiento;
-        int movPadre = -1;/*Movimiento para llegar al padre*/
-        ArrayList<Integer> vistos = new ArrayList<>(); /*Lista de nodos vistos*/
-
-        long tiempo_inicial = System.currentTimeMillis();
+        int movPadre=-1;/*Movimiento para llegar al padre*/
+        ArrayList<NPuzzle> vistos=new ArrayList<>(); /*Lista de nodos vistos*/
+        
+        long tiempo_inicial=System.currentTimeMillis();
         while (!this.objetivo()) {
-            movimiento = (int) (Math.random() * 5);
-            if (movimiento != movPadre && this.mueve(movimiento)) {
-                vistos.add(0, movimiento);
-                movPadre = inverso(movimiento);
+            movimiento = (int)(Math.random()*5); 
+            if (movimiento!=movPadre && this.mueve(movimiento)) {
+		    vistos.add(0,new NPuzzle(this));
+                    movPadre=inverso(movimiento);
             }
 
-            /*Si llevamos más de TMAX segundos, no hemos encontrado solución*/
-            double tiempo_total = (System.currentTimeMillis() - tiempo_inicial) / 1000.;
-            if (tiempo_total > tMax) {
-                System.out.println("Vistos=" + vistos.size());
-                return new ArrayList<>();
-            }
+            /*Si llevamos mÃ¡s de TMAX segundos, no hemos encontrado soluciÃ³n*/
+            double tiempo_total=(System.currentTimeMillis()-tiempo_inicial)/1000.;
+            if (tiempo_total>60/*TMAX*/){System.out.println("Vistos="+vistos.size());return new ArrayList<>();}
         }
         return vistos;
     }
-    
-    public ArrayList<Integer>improvedRandomSearch(Integer tMax) {
-
-        int movimiento;
-        int movPadre = -1;/*Movimiento para llegar al padre*/
-        ArrayList<Integer> vistos = new ArrayList<>(); /*Lista de nodos vistos*/
-
-        long tiempo_inicial = System.currentTimeMillis();
-        while (!this.objetivo()) {
-            ArrayList<Integer> allowedMovements = this.allowedMovements();
-            int index = (int)(Math.random() * allowedMovements.size());
-            movimiento = allowedMovements.get(index);
-            if (movimiento != movPadre && this.mueve(movimiento)) {
-                vistos.add(0, movimiento);
-                movPadre = inverso(movimiento);
-            }
-
-            /*Si llevamos más de TMAX segundos, no hemos encontrado solución*/
-            double tiempo_total = (System.currentTimeMillis() - tiempo_inicial) / 1000.;
-            if (tiempo_total > tMax) {
-                System.out.println("Vistos=" + vistos.size());
-                return new ArrayList<>();
-            }
-        }
-        return vistos;
-    }
-    
-    public ArrayList<Integer>depthFirstSearch(Integer tMax) {
-        ArrayList<NPuzzle> opened = new ArrayList<NPuzzle>();
-        ArrayList<NPuzzle> closed = new ArrayList<NPuzzle>();
-        ArrayList<Integer> allowedMovements = null;
-        
-        HashMap <Integer, Boolean> hashMap = new HashMap <Integer,Boolean>();
-        //hashMap.getOrDefault(this.tablero.hashCode(), false);
-        hashMap.put(this.tablero.hashCode(), true);
-        opened.add(this);
-        
-        NPuzzle current = opened.get(0);
-       
-        boolean found = current.objetivo();
-        
-        long tiempo_inicial = System.currentTimeMillis();
-        while (!found){
-            
-            allowedMovements = current.allowedMovements();
-            for (Integer i : allowedMovements){
-                NPuzzle copy = new NPuzzle(current);
-                copy.mueve(i);
-                
-                boolean viewed = hashMap.getOrDefault(copy.tablero.hashCode(), false);
-                if (!viewed) {
-                    hashMap.put(copy.tablero.hashCode(), true);
-                    opened.add(copy);
-                }
-            }
-            
-            opened.remove(current);
-            closed.add(0, current);
-            
-            if (opened.size() > 0) {
-                current = opened.get(0);
-                found = current.objetivo();
-                //System.out.println("Current Puzzle:\n\n" + current);
-            }else{
-                break;
-            }
-            
-            
-            double tiempo_total = (System.currentTimeMillis() - tiempo_inicial) / 1000.;
-            if (tiempo_total > tMax) {
-                break;
-            }
-            
-        }
-        
-        if(found){
-            return plan(closed, this);
-        }else{
-            return new ArrayList<Integer>();
-        }
-       
-    }
-    
-     public ArrayList<Integer>breadthFirstSearch(Integer tMax) {
-        ArrayList<NPuzzle> opened = new ArrayList<NPuzzle>();
-        ArrayList<NPuzzle> closed = new ArrayList<NPuzzle>();
-        ArrayList<Integer> allowedMovements = null;
-        
-        HashMap <Integer, Boolean> hashMap = new HashMap <Integer,Boolean>();
-        //hashMap.getOrDefault(this.tablero.hashCode(), false);
-        hashMap.put(this.tablero.hashCode(), true);
-        opened.add(this);
-        
-        NPuzzle current = opened.get(0);
-       
-        boolean found = current.objetivo();
-        
-        long tiempo_inicial = System.currentTimeMillis();
-        while (!found){
-            
-            allowedMovements = current.allowedMovements();
-            for (Integer i : allowedMovements){
-                NPuzzle copy = new NPuzzle(current);
-                copy.mueve(i);
-                
-                boolean viewed = hashMap.getOrDefault(copy.tablero.hashCode(), false);
-                if (!viewed) {
-                    hashMap.put(copy.tablero.hashCode(), true);
-                    opened.add(1, copy);
-                }
-            }
-            
-            opened.remove(current);
-            closed.add(0, current);
-            
-            if (opened.size() > 0) {
-                current = opened.get(0);
-                found = current.objetivo();
-                //System.out.println("Current Puzzle:\n\n" + current);
-            }else{
-                break;
-            }
-            
-            
-            double tiempo_total = (System.currentTimeMillis() - tiempo_inicial) / 1000.;
-            if (tiempo_total > tMax) {
-                break;
-            }
-            
-        }
-        
-        if(found){
-            return plan(closed, this);
-        }else{
-            return new ArrayList<Integer>();
-        }
-       
-    }
-    
-    
-     public ArrayList<Integer>depthFirstSearchWithHillClimbing(Integer tMax) {
-        ArrayList<NPuzzle> opened = new ArrayList<NPuzzle>();
-        ArrayList<NPuzzle> closed = new ArrayList<NPuzzle>();
-        ArrayList<Integer> allowedMovements = null;
-        
-        HashMap <Integer, Boolean> hashMap = new HashMap <Integer,Boolean>();
-        //hashMap.getOrDefault(this.tablero.hashCode(), false);
-        hashMap.put(this.tablero.hashCode(), true);
-        opened.add(this);
-        
-        NPuzzle current = opened.get(0);
-       
-        boolean found = current.objetivo();
-        
-        long tiempo_inicial = System.currentTimeMillis();
-        while (!found){
-            
-            allowedMovements = current.allowedMovements();
-            for (Integer i : allowedMovements){
-                NPuzzle copy = new NPuzzle(current);
-                copy.mueve(i);
-                
-                boolean viewed = hashMap.getOrDefault(copy.tablero.hashCode(), false);
-                if (!viewed && copy.h < current.h) {
-                    hashMap.put(copy.tablero.hashCode(), true);
-                    opened.add(copy);
-                }
-            }
-            
-            opened.remove(current);
-            closed.add(0, current);
-            
-            if (opened.size() > 0) {
-                current = opened.get(0);
-                found = current.objetivo();
-                //System.out.println("Current Puzzle:\n\n" + current);
-            }else{
-                break;
-            }
-            
-            
-            double tiempo_total = (System.currentTimeMillis() - tiempo_inicial) / 1000.;
-            if (tiempo_total > tMax) {
-                break;
-            }
-            
-        }
-        
-        if(found){
-            return plan(closed, this);
-        }else{
-            return new ArrayList<Integer>();
-        }
-       
-    }
-     
-    public ArrayList<Integer> aBestFirstSearch(Integer tMax){
-
-        ArrayList<NPuzzle> opened = new ArrayList<>();
-        ArrayList<NPuzzle> closed = new ArrayList<>();
-        HashMap <Integer, Boolean> hashMap = new HashMap <Integer,Boolean>();
-        ArrayList<Integer> steps = new ArrayList<>();
-        ArrayList<Integer> possibles = new ArrayList<>();
-         
-        NPuzzle current, newPuzzle;
-        boolean found = false;
-
-        hashMap.put(this.tablero.hashCode(), true);
-        opened.add(this);
-
-      
-        long tiempo_inicial = System.currentTimeMillis();
-        while (!found){
-
-            //seleccionar
-            try {
-                current = opened.get(0);
-            }catch (Exception e){
-   
-                return steps;
-            }
-            //comprobar si objetivo
-            found = current.objetivo();
-
-   
-            possibles = current.allowedMovements();
-            for (int i : possibles){
-                newPuzzle = new NPuzzle(current);
-                newPuzzle.mueve(i);
-                
-                boolean viewed = hashMap.getOrDefault(newPuzzle.tablero.hashCode(), false);
-                if (!viewed) {
-                    hashMap.put(newPuzzle.tablero.hashCode(), true);
-                    
-                    ListIterator<NPuzzle> iterator = opened.listIterator();
-                    NPuzzle pointer;
-                    try {
-                        int f = newPuzzle.f();
-                        while (true){
-                            pointer = iterator.next();
-                            if (f < pointer.f()) {
-                                iterator.add(newPuzzle);
-                                break;
-                            }
-                        }
-                    } catch (NoSuchElementException e) {
-                        iterator.add(newPuzzle);
-                    }
-                }
-            }
-            
-            opened.remove(current);
-            closed.add(0,current);
-            
-            
-            double tiempo_total = (System.currentTimeMillis() - tiempo_inicial) / 1000.;
-            if (tiempo_total > tMax) {
-                break;
-            }
-            
-        }
-        steps = plan(closed, this);
-      
-        return steps;
-    }
-
-
-    
-    
     /*---------------------------------------------------------------------------*/
     /**
-     * Este método devuelve el plan de movimientos seguidos desde el origen hasta el
-     * objetivo (que debería ser el primero de la lista).
+     * Este mÃ©todo devuelve el plan de movimientos seguidos desde el origen hasta el
+     * objetivo (que deberÃ­a ser el primero de la lista).
      * @param lista listado de nodos
      * @param origen nodo original
        @return la lista con los movimientos.
@@ -766,51 +458,383 @@ public class NPuzzle {
         }
         return movimientos;
     }
-    /*---------------------------------------------------------------------------*/
-    /**Función para probar la búsquedas en el NPuzzle.
-     * @param args the command line arguments
+    /*--------------------------------------------------------------------------*/
+    /**Función para implementar BPP
+     * @return Lista de movimientos vistos
      */
-    public static void main(String[] args) {
-        
-        int n;
-        NPuzzle puzzle;
-        String salida=null;
-        //Si el número de parámetros es incorrecto salimos
-        if (args.length < 2){
-            System.out.println("npuzzle "+"<fich_puzzle> 8/15 [<fich_salida>]\n");
-            System.out.println(" Usando n=8. Genero puzzle aleatorio.  ");
-            n=8;
-            puzzle= new NPuzzle(n);
-            
-        } else {
-            n=(Integer.valueOf(args[1])).intValue();
-            puzzle= new NPuzzle(args[0],n);
-            if (args.length>2) salida=args[2];
+    public ArrayList<NPuzzle> busqueda_BPP() { 
+        int[] movimientos =  {ARRIBA,ABAJO,IZQUIERDA,DERECHA};
+        ArrayList<NPuzzle> abiertos=new ArrayList<>();
+        ArrayList<NPuzzle> cerrados=new ArrayList<>();
+        NPuzzle N;
+
+        abiertos.add(0,new NPuzzle(this));
+        long tiempo_inicial=System.currentTimeMillis();
+        while (!abiertos.isEmpty()) {
+            N = abiertos.remove(0);
+            cerrados.add(0,new NPuzzle(N));
+            if (N.objetivo()) {
+                return cerrados; 
+            }
+            for (int movimiento:movimientos) {
+                if (N.mueve(movimiento)) {
+                    if (!cerrados.contains(N)) {
+                        N.padre = inverso(movimiento);
+                        abiertos.add(0,new NPuzzle(N));
+                    }		    
+                    N.mueve(inverso(movimiento));
+                }
+            }
+            double tiempo_total=(System.currentTimeMillis()-tiempo_inicial)/1000.;
+            /*Si llevamos más de TMAX segundos, no hemos encontrado solución*/
+            if (tiempo_total>TMAX){System.out.println("Vistos="+cerrados.size());return new ArrayList<NPuzzle>();}
         }
+        return cerrados;
+    }
+        /*--------------------------------------------------------------------------*/
+    /**Función para implementar BPP
+     * @return Lista de movimientos vistos
+     */
+    public ArrayList<NPuzzle> busqueda_BPA() { 
+        int[] movimientos =  {ARRIBA,ABAJO,IZQUIERDA,DERECHA};
+        ArrayList<NPuzzle> abiertos=new ArrayList<>();
+        ArrayList<NPuzzle> cerrados=new ArrayList<>();
+        NPuzzle N;
 
-        System.out.println("Puzzle Inicial:\n"+puzzle);
+        abiertos.add(0,new NPuzzle(this));
+        long tiempo_inicial=System.currentTimeMillis();
+        while (!abiertos.isEmpty()) {
+            N = abiertos.remove(0);
+            cerrados.add(0,new NPuzzle(N));
+            if (N.objetivo()) {
+                return cerrados; 
+            }
+            for (int movimiento:movimientos) {
+                if (N.mueve(movimiento)) {
+                    if (!cerrados.contains(N)) {
+                        N.padre = inverso(movimiento);
+                        abiertos.add(new NPuzzle(N));
+                    }		    
+                    N.mueve(inverso(movimiento));
+                }
+            }
+            double tiempo_total=(System.currentTimeMillis()-tiempo_inicial)/1000.;
+            /*Si llevamos más de TMAX segundos, no hemos encontrado solución*/
+            if (tiempo_total>TMAX){System.out.println("Vistos="+cerrados.size());return new ArrayList<NPuzzle>();}
+        }
+        return cerrados;
+    }
+        /*--------------------------------------------------------------------------*/
+    /**Función para implementar BPP
+     * @return Lista de movimientos vistos
+     */
+    public ArrayList<NPuzzle> busqueda_BPP_iterativa() { 
+        int[] movimientos =  {ARRIBA,ABAJO,IZQUIERDA,DERECHA};
+        ArrayList<NPuzzle> abiertos=new ArrayList<>();
+        ArrayList<NPuzzle> cerrados=new ArrayList<>();
+        NPuzzle N;
+        int limite = 1;
+        int contador = 0;
+        int iteracion = 0;
+        long tiempo_inicial=System.currentTimeMillis();
+        abiertos.add(0, new NPuzzle(this));
+        while (!abiertos.isEmpty()) {
+            // No estoy seguro de que funcione bien
+            abiertos=new ArrayList<>();
+            cerrados=new ArrayList<>();
+            while (contador < limite) {
+                abiertos.add(0, new NPuzzle(this));
+                while (iteracion < limite) {
+                    if (iteracion >= limite - contador) {
+                        N = abiertos.remove(1);
+                    } else {
+                        N = abiertos.remove(0);
+                    }
+                    cerrados.add(0,new NPuzzle(N));
+                    if (N.objetivo()) {
+                        return cerrados;  // Debo arreglar esto
+                    }
+                    for (int movimiento:movimientos) {
+                        if (N.mueve(movimiento)) {
+                            if (!cerrados.contains(N)) {
+                                N.padre = inverso(movimiento);
+                                abiertos.add(0,new NPuzzle(N));
+                            }		    
+                            N.mueve(inverso(movimiento));
+                        }
+                    }
+                    iteracion++;
+                }
+                contador ++;
+                iteracion = 0;
+            }
+            limite++;
+            contador = 0;
+            double tiempo_total=(System.currentTimeMillis()-tiempo_inicial)/1000.;
+            /*Si llevamos más de TMAX segundos, no hemos encontrado solución*/
+            if (tiempo_total>TMAX){System.out.println("Vistos="+cerrados.size());return new ArrayList<NPuzzle>();}
+        }
+        return cerrados;
+    }
+    /*--------------------------------------------------------------------------*/
+    /**Función para implementar escalada simple
+     * @return Lista de movimientos vistos
+     */
+    public ArrayList<NPuzzle> busqueda_escalada_simple() { 
+        int[] movimientos =  {ARRIBA,ABAJO,IZQUIERDA,DERECHA};
+        ArrayList<NPuzzle> abiertos=new ArrayList<>();
+        ArrayList<NPuzzle> cerrados=new ArrayList<>();
+        NPuzzle N;
+        NPuzzle hijo;
+        N = new NPuzzle(this);
         
-        //Miramos si el puzzle tiene solución
-        if (!puzzle.resoluble()){
-	    System.out.println("EL puzzle NO tiene solución\n");
-	    System.exit(0);
-	} else  System.out.println("EL puzzle SÍ tiene solución\n");
-
-        //Lanzamos un algoritmo de búsqueda aleatoria y miramos el tiempo que tarda
+        abiertos.add(0,new NPuzzle(this));
+        long tiempo_inicial=System.currentTimeMillis();
+        while (!abiertos.isEmpty()) {
+            hijo = abiertos.remove(0);
+            if (hijo.h <= N.h) {
+                N = hijo;
+                cerrados.add(0,new NPuzzle(N));
+                if (N.objetivo()) {
+                    return cerrados; 
+                }
+                for (int movimiento:movimientos) {
+                    if (N.mueve(movimiento)) {
+                        if (!cerrados.contains(N)) {
+                            N.padre = inverso(movimiento);
+                            abiertos.add(0,new NPuzzle(N));
+                        }		    
+                        N.mueve(inverso(movimiento));
+                    }
+                }
+            }
+            
+            double tiempo_total=(System.currentTimeMillis()-tiempo_inicial)/1000.;
+            /*Si llevamos más de TMAX segundos, no hemos encontrado solución*/
+            if (tiempo_total>TMAX){System.out.println("Vistos="+cerrados.size());return new ArrayList<NPuzzle>();}
+        }
+        return cerrados;
+    }
+    /*--------------------------------------------------------------------------*/
+    /**Función para implementar escalada máxima pendiente
+     * @return Lista de movimientos vistos
+     */
+    public ArrayList<NPuzzle> busqueda_escalada_maxima() { 
+        int[] movimientos =  {ARRIBA,ABAJO,IZQUIERDA,DERECHA};
+        ArrayList<NPuzzle> abiertos=new ArrayList<>();
+        ArrayList<NPuzzle> cerrados=new ArrayList<>();
+        NPuzzle N;
+        NPuzzle hijo;
+        NPuzzle mejor;
+        
+        N = new NPuzzle(this);
+        
+        abiertos.add(0,new NPuzzle(this));
+        long tiempo_inicial=System.currentTimeMillis();
+        while (!abiertos.isEmpty()) {
+            hijo = abiertos.remove(0);
+            if (hijo.h <= N.h) {
+                N = hijo;
+                cerrados.add(0,new NPuzzle(N));
+                if (N.objetivo()) {
+                    return cerrados; 
+                }
+                mejor = new NPuzzle(N);
+                for (int movimiento:movimientos) {
+                    if (N.mueve(movimiento)) {
+                        if (!cerrados.contains(N)) {
+                            N.padre = inverso(movimiento);
+                            if (N.h < mejor. h) {
+                                mejor = new NPuzzle(N);
+                                mejor.padre = N.padre;
+                            }
+                        }		    
+                        N.mueve(inverso(movimiento));
+                    }
+                }
+                if (!mejor.equals(N)) {
+                    abiertos.add(0,new NPuzzle(mejor));
+                }
+            }
+            
+            double tiempo_total=(System.currentTimeMillis()-tiempo_inicial)/1000.;
+            /*Si llevamos más de TMAX segundos, no hemos encontrado solución*/
+            if (tiempo_total>TMAX){System.out.println("Vistos="+cerrados.size());return new ArrayList<NPuzzle>();}
+        }
+        return cerrados;
+    }
+    /*--------------------------------------------------------------------------*/
+    /**Función para implementar Primero el mejor
+     * @return Lista de movimientos vistos
+     */
+    public ArrayList<NPuzzle> busqueda_BPM() { 
+        int[] movimientos =  {ARRIBA,ABAJO,IZQUIERDA,DERECHA};
+        ArrayList<NPuzzle> abiertos=new ArrayList<>();
+        ArrayList<NPuzzle> cerrados=new ArrayList<>();
+        NPuzzle hijo;
+        NPuzzle mejor;
+        int min_value;
+        int min_pos;
+        
+        abiertos.add(0,new NPuzzle(this));
+        long tiempo_inicial=System.currentTimeMillis();
+        while (!abiertos.isEmpty()) {
+            // Extraemos el mejor nodo:
+            min_value = abiertos.get(0).f();
+            min_pos = 0;
+            for (int i=1; i<abiertos.size();i++) {
+                if (abiertos.get(i).f() < min_value) {
+                    min_value = abiertos.get(i).f();
+                    min_pos = i;
+                }
+            }
+            mejor = abiertos.remove(min_pos);
+            cerrados.add(0,new NPuzzle(mejor));
+            if (mejor.objetivo()) {
+                return cerrados; 
+            }
+            for (int movimiento:movimientos) {
+                // Genero el nodo sucesor
+                hijo = new NPuzzle(mejor);
+                if (hijo.mueve(movimiento)) {
+                    // Añadimos el nuevo camino
+                    if (!hijo.esta_en(abiertos) && !hijo.esta_en(cerrados)) {
+                        hijo.padre = inverso(movimiento);
+                        abiertos.add(0,new NPuzzle(hijo));
+                    }
+                }		    
+            }
+            
+            double tiempo_total=(System.currentTimeMillis()-tiempo_inicial)/1000.;
+            /*Si llevamos más de TMAX segundos, no hemos encontrado solución*/
+            if (tiempo_total>TMAX){System.out.println("Vistos="+cerrados.size());return new ArrayList<NPuzzle>();}
+        }
+        return cerrados;
+    }
+    /*--------------------------------------------------------------------------*/
+    /**Función para ver si una lista contiene un puzzle
+     * 
+     */
+        public boolean esta_en(ArrayList<NPuzzle> lista) {
+        for (int i=0;i<lista.size();i++) {
+            if (this.equals(lista.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    /*--------------------------------------------------------------------------*/
+    /**Función para lanzar la búsqueda aleatoria
+     * 
+     */
+    public void launch_aleatoria(String salida) {
+        //Lanzamos un algoritmo de bÃºsqueda aleatoria y miramos el tiempo que tarda
         System.out.println("\nComienza la búsqueda aleatoria ("+TMAX+"segundos max)");
         long tiempo_inicial=System.currentTimeMillis();
-	NPuzzle copia=new NPuzzle(puzzle);
+	NPuzzle copia=new NPuzzle(this);
+        ArrayList<NPuzzle> nodos=copia.busquedaAleatoria();
+        System.out.println("Tiempo ="+(System.currentTimeMillis()-tiempo_inicial)/1000.+"seg");
+        salida(nodos, salida);
+    }
+    /*---------------------------------------------------------------------------*/
+    /**Función para lanzar la búsqueda en profuncidad
+     * 
+     */
+    public void launch_BPP(String salida) {
+        //Lanzamos un algoritmo de búsqueda en profundidad y miramos el tiempo que tarda
+        System.out.println("\nComienza la búsqueda BPP ("+TMAX+"segundos max)");
+        long tiempo=System.currentTimeMillis();
+	NPuzzle BPP=new NPuzzle(this);
+        ArrayList<NPuzzle> nodos=BPP.busqueda_BPP();
+        System.out.println("Tiempo ="+(System.currentTimeMillis()-tiempo)/1000.+"seg");        
+        salida(nodos, salida);
+    }
+    /*---------------------------------------------------------------------------*/
+    /**Función para lanzar la búsqueda en profuncidad
+     * 
+     */
+    public void launch_BPA(String salida) {
+        //Lanzamos un algoritmo de búsqueda en profundidad y miramos el tiempo que tarda
+        System.out.println("\nComienza la búsqueda BPA ("+TMAX+"segundos max)");
+        long tiempo=System.currentTimeMillis();
+	NPuzzle BPA=new NPuzzle(this);
+        ArrayList<NPuzzle> nodos=BPA.busqueda_BPA();
+        System.out.println("Tiempo ="+(System.currentTimeMillis()-tiempo)/1000.+"seg");
+        salida(nodos, salida);
+    }
+    /**Función para lanzar la búsqueda en profuncidad
+     * 
+     */
+    public void launch_BPP_iterativa(String salida) {
+        //Lanzamos un algoritmo de búsqueda en profundidad y miramos el tiempo que tarda
+        System.out.println("\nComienza la búsqueda BPP iterativa("+TMAX+"segundos max)");
+        long tiempo=System.currentTimeMillis();
+	NPuzzle BPP=new NPuzzle(this);
+        ArrayList<NPuzzle> nodos=BPP.busqueda_BPP_iterativa();
+        System.out.println("Tiempo ="+(System.currentTimeMillis()-tiempo)/1000.+"seg");        
+        salida(nodos, salida);
+    }
+    /*---------------------------------------------------------------------------*/
+    /**Función para lanzar la búsqueda en escalada simple
+     * 
+     */
+    public void launch_escalada_simple(String salida) {
+        //Lanzamos un algoritmo de búsqueda en profundidad y miramos el tiempo que tarda
+        System.out.println("\nComienza la búsqueda escalada simple ("+TMAX+"segundos max)");
+        long tiempo=System.currentTimeMillis();
+	NPuzzle escalada_simple=new NPuzzle(this);
+        ArrayList<NPuzzle> nodos=escalada_simple.busqueda_escalada_simple();
+        System.out.println("Tiempo ="+(System.currentTimeMillis()-tiempo)/1000.+"seg");
+        salida_heuristica(nodos, salida);
+    }
+    /*---------------------------------------------------------------------------*/
+    /**Función para lanzar la búsqueda en escalada máxima pendiente
+     * 
+     */
+    public void launch_escalada_maxima(String salida) {
+        //Lanzamos un algoritmo de búsqueda en profundidad y miramos el tiempo que tarda
+        System.out.println("\nComienza la búsqueda escalada de máxima pendiente ("+TMAX+"segundos max)");
+        long tiempo=System.currentTimeMillis();
+	NPuzzle escalada_maxima=new NPuzzle(this);
+        ArrayList<NPuzzle> nodos=escalada_maxima.busqueda_escalada_maxima();
+        System.out.println("Tiempo ="+(System.currentTimeMillis()-tiempo)/1000.+"seg");
+        salida_heuristica(nodos, salida);
+    }
+    /*---------------------------------------------------------------------------*/
+    /**FunciÃ³n para probar la mostrar la salida.
+     * @param args the command line arguments
+     */
+    /*---------------------------------------------------------------------------*/
+    /**Función para lanzar la búsqueda en escalada máxima pendiente
+     * 
+     */
+    public void launch_BPM(String salida) {
+        //Lanzamos un algoritmo de búsqueda en profundidad y miramos el tiempo que tarda
+        System.out.println("\nComienza la búsqueda primero el mejor ("+TMAX+"segundos max)");
+        long tiempo=System.currentTimeMillis();
+	NPuzzle BPM=new NPuzzle(this);
+        ArrayList<NPuzzle> nodos=BPM.busqueda_BPM();
+        System.out.println("Tiempo ="+(System.currentTimeMillis()-tiempo)/1000.+"seg");
+        salida_heuristica(nodos, salida);
+    }
+    /*--------------------------------------------------------------------------*/
+    public void salida(ArrayList<NPuzzle> nodos, String salida) {
         ArrayList<Integer> movs=null;
-        ArrayList<Integer> nodos=copia.busquedaAleatoria(TMAX);
+        
         if (nodos.size()<=0) 
             System.out.println("Solución NO encontrada.");
         else {
             System.out.println("Solución encontrada. Nodos vistos:"+nodos.size());//+"\n ->"+nodos)
-        }
-        System.out.println("Tiempo ="+(System.currentTimeMillis()-tiempo_inicial)/1000.+"seg");
-
+            System.out.println(nodos.get(0).toString());
+        }      
         
-        
+        movs = this.plan(nodos, this);
+        if (movs != null) {
+            System.out.println("Solución");
+            for (Integer i: movs)
+                System.out.println(i+" ");
+            System.out.println("Movimientos: " + movs.size());
+        }  
         /*Guardamos la salida, si nos han dado un fichero para guardarlo*/
         if (salida!=null && movs!=null) {
             try {
@@ -822,5 +846,87 @@ public class NPuzzle {
                 Logger.getLogger(NPuzzle.class.getName()).log(Level.SEVERE, "Fallo escribiendo fichero salida", ex);
             } 
         }
-    }//End función main
+    }
+        /*---------------------------------------------------------------------------*/
+    /**FunciÃ³n para probar la mostrar la salida.
+     * @param args the command line arguments
+     */
+    /*--------------------------------------------------------------------------*/
+    public void salida_heuristica(ArrayList<NPuzzle> nodos, String salida) {
+        ArrayList<Integer> movs=null;
+        
+        if (nodos.get(0).objetivo()) {
+            System.out.println("Solución encontrada. Nodos vistos:"+nodos.size());//+"\n ->"+nodos)
+            System.out.println(nodos.get(0).toString());
+            
+            movs = this.plan(nodos, this);
+            if (movs != null) {
+                System.out.println("Solución");
+                for (Integer i: movs)
+                    System.out.println(i+" ");
+                System.out.println("Movimientos: " + movs.size());
+            }  
+            /*Guardamos la salida, si nos han dado un fichero para guardarlo*/
+            if (salida!=null && movs!=null) {
+                try {
+                    Writer out = new FileWriter(salida);
+                    for (Integer i: movs)
+                        out.write(i+" ");
+                    out.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(NPuzzle.class.getName()).log(Level.SEVERE, "Fallo escribiendo fichero salida", ex);
+                } 
+            }       
+        } else if(nodos.get(0).h < nodos.get(nodos.size() - 1).h ) {
+            System.out.println( "Nodos vistos:"+nodos.size());
+            System.out.println("Solución NO encontrada. Pero mejoramos heurística de: " + nodos.get(nodos.size() - 1).h +  " a " + nodos.get(0).h );
+            System.out.println(nodos.get(0).toString());
+        } else {
+            System.out.println("Solución NO encontrada. No posible mejorar heurística: " + nodos.get(nodos.size() - 1).h);
+            System.out.println(nodos.get(0).toString());
+        }       
+    }
+    public static void main(String[] args) {       
+        int n;
+        NPuzzle puzzle;
+        String salida=null;
+        String busqueda=null;
+        //Si el nÃºmero de parÃ¡metros es incorrecto salimos
+        if (args.length < 2){
+            System.out.println("npuzzle "+"<fich_puzzle> 8/15 [<fich_salida>]\n");
+            System.out.println(" Usando n=8. Genero puzzle aleatorio.  ");
+            n=8;
+            puzzle= new NPuzzle(n);
+        } else {
+            n=(Integer.valueOf(args[1])).intValue();
+            puzzle= new NPuzzle(args[0],n);
+            if (args.length>2) salida=args[2];
+            if (args.length>3) busqueda=args[3];
+        }
+
+        System.out.println("Puzzle Inicial:\n"+puzzle);
+        
+        //Miramos si el puzzle tiene soluciÃ³n
+        if (!puzzle.resoluble()){
+	    System.out.println("EL puzzle NO tiene solución\n");
+	    System.exit(0);
+	} else  System.out.println("EL puzzle Sí tiene solución\n");
+        
+        if (busqueda == "Aleatoria")
+            puzzle.launch_aleatoria(salida);
+        else if (busqueda == "BPP")
+            puzzle.launch_BPP(salida);
+        else if (busqueda == "BPA")
+            puzzle.launch_BPA(salida);
+        else if (busqueda == "BPPI")
+            puzzle.launch_BPP_iterativa(salida);
+        else if (busqueda == "ES")
+            puzzle.launch_escalada_simple(salida);
+        else if (busqueda == "EMP")
+            puzzle.launch_escalada_maxima(salida);
+        else if (busqueda == "BPM")
+            puzzle.launch_BPM(salida);
+        else
+            puzzle.launch_escalada_simple(salida);
+    }//End funciÃ³n main
 }
